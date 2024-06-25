@@ -54,46 +54,7 @@ class _PaymentHistoryPageState extends State<PaymentHistoryPage> {
                   child: FirebaseAnimatedList(
                 query: reference,
                 itemBuilder: (context, snapshot, animation, index) {
-                  return Padding(
-                    padding: EdgeInsets.all(8.h),
-                    child: Container(
-                      height: 40.h,
-                      width: double.infinity,
-                      decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(5.h),
-                          border: Border.all(color: AppColors.bottomColor)),
-                      child: Padding(
-                        padding: EdgeInsets.symmetric(horizontal: 10.w),
-                        child: Row(
-                          children: [
-                            InkWell(
-                                onTap: () {},
-                                child: Icon(
-                                  Icons.arrow_downward_sharp,
-                                  size: 1.h,
-                                )),
-                            5.widthBox,
-                            Text(
-                              DateTimeHelper.getDatetimeFormat(DateTime.parse(
-                                  snapshot.child('date').value.toString())),
-                              style: TextStyle(
-                                  fontSize: 14.sp,
-                                  fontWeight: FontWeight.w600,
-                                  color: Colors.grey[600]),
-                            ),
-                            const Spacer(),
-                            Text(
-                              '${snapshot.child('amount').value} EGY',
-                              style: TextStyle(
-                                  fontSize: 14.sp,
-                                  fontWeight: FontWeight.w600,
-                                  color: AppColors.bottomColor),
-                            )
-                          ],
-                        ),
-                      ),
-                    ),
-                  );
+                  return PaymentHistoryItem(snapshot: snapshot);
                 },
               ))
             ],
@@ -104,22 +65,186 @@ class _PaymentHistoryPageState extends State<PaymentHistoryPage> {
   }
 }
 
+// ignore: must_be_immutable
+class PaymentHistoryItem extends StatefulWidget {
+  final DataSnapshot snapshot;
+  bool isOpen = false;
+   PaymentHistoryItem({super.key, required this.snapshot});
 
-// Padding(
-//                   padding:  EdgeInsets.all(8.h),
-//                   child: Container(
-//                     height: 40.h,
-//                     width: double.infinity,
-//                     decoration: BoxDecoration(
-//                       borderRadius: BorderRadius.circular(5.h),
-//                       border: Border.all(
-//                         color: AppColors.bottomColor
-//                       )
-//                     ),
-//                     child: Row(
-//                       children: [
-//                         // Text(DateTimeHelper.getDatetimeFormat(payData[index]['date']))
-//                       ],
-//                     ),
-//                   ),
-//                 );
+  @override
+  State<PaymentHistoryItem> createState() => _PaymentHistoryItemState();
+}
+
+class _PaymentHistoryItemState extends State<PaymentHistoryItem> {
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: EdgeInsets.all(8.h),
+      child: !widget.isOpen? Container(
+        height: 40.h,
+        width: double.infinity,
+        decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(5.h),
+            border: Border.all(color: AppColors.bottomColor)),
+        child: Padding(
+          padding: EdgeInsets.symmetric(horizontal: 10.w),
+          child: Row(
+            children: [
+              InkWell(
+                  onTap: () {
+                    setState(() {
+                      widget.isOpen = !widget.isOpen;
+                    });
+                  },
+                  child: Icon(
+                    Icons.arrow_downward_sharp,
+                    size: 20.h,
+                  )),
+              5.widthBox,
+              Text(
+                DateTimeHelper.getDatetimeFormat(
+                    DateTime.parse(widget.snapshot.child('date').value.toString())),
+                style: TextStyle(
+                    fontSize: 14.sp,
+                    fontWeight: FontWeight.w600,
+                    color: Colors.grey[600]),
+              ),
+              const Spacer(),
+              Text(
+                '${widget.snapshot.child('amount').value} EGY',
+                style: TextStyle(
+                    fontSize: 14.sp,
+                    fontWeight: FontWeight.w600,
+                    color: AppColors.bottomColor),
+              )
+            ],
+          ),
+        ),
+      ):Container(
+         height: 140.h,
+        width: double.infinity,
+        decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(5.h),
+            border: Border.all(color: AppColors.bottomColor)),
+        child: Column(
+          children: [
+            Padding(
+              padding: EdgeInsets.symmetric(horizontal: 10.w,vertical: 8.h),
+              child: Row(
+                children: [
+                  InkWell(
+                    onTap: () {
+                      setState(() {
+                        widget.isOpen = !widget.isOpen;
+                      });
+                    },
+                    child: Icon(
+                      Icons.arrow_upward_rounded,
+                      size: 20.h,
+                    )),
+                    Text(
+                    'Details',
+                    style: TextStyle(
+                        fontSize: 22.sp,
+                        fontWeight: FontWeight.bold,
+                        color: AppColors.bottomColor),
+                  )
+                ],
+              ),
+            ),
+            Padding(
+              padding: EdgeInsets.symmetric(horizontal: 10.w,vertical: 1.h),
+              child: Row(
+                children: [
+                    Text(
+                    'Date:',
+                    style: TextStyle(
+                        fontSize: 15.sp,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.black),
+                  ),
+                  5.widthBox,
+                   Text(
+                DateTimeHelper.getDatetimeFormat(
+                    DateTime.parse(widget.snapshot.child('date').value.toString())),
+                style: TextStyle(
+                    fontSize: 15.sp,
+                    fontWeight: FontWeight.w600,
+                    color: Colors.grey[600]),
+              ),
+                ],
+              ),
+            ),
+            Padding(
+              padding: EdgeInsets.symmetric(horizontal: 10.w,vertical: 1.h),
+              child: Row(
+                children: [
+                    Text(
+                    'Time:',
+                    style: TextStyle(
+                        fontSize: 15.sp,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.black),
+                  ),
+                  5.widthBox,
+                   Text(
+                DateTimeHelper.getHoursByAmBm(
+                    DateTime.parse(widget.snapshot.child('date').value.toString())),
+                style: TextStyle(
+                    fontSize: 15.sp,
+                    fontWeight: FontWeight.w600,
+                    color: Colors.grey[600]),
+              ),
+                ],
+              ),
+            ),
+            Padding(
+              padding: EdgeInsets.symmetric(horizontal: 10.w,vertical: 1.h),
+              child: Row(
+                children: [
+                    Text(
+                    'Payment method:',
+                    style: TextStyle(
+                        fontSize: 15.sp,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.black),
+                  ),
+                  5.widthBox,
+                Text(
+                    widget.snapshot.child('type').value.toString() == 'visa'?'VISA xxxx xxxx xxxx xxxx 6858':'01xxxxxxxxx',
+                    style: TextStyle(
+                    fontSize: 12.sp,
+                    fontWeight: FontWeight.w600,
+                    color: Colors.grey[600]),
+              ),
+                ],
+              ),
+            ),
+            Padding(
+              padding: EdgeInsets.symmetric(horizontal: 10.w,vertical: 1.h),
+              child: Row(
+                children: [
+                    Text(
+                    'Amount:',
+                    style: TextStyle(
+                        fontSize: 15.sp,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.black),
+                  ),
+                  5.widthBox,
+                Text(
+                    widget.snapshot.child('amount').value.toString() + ' EGY',
+                    style: TextStyle(
+                    fontSize: 15.sp,
+                    fontWeight: FontWeight.w600,
+                    color: Colors.grey[600]),
+              ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}

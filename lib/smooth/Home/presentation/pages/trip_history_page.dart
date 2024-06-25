@@ -54,63 +54,213 @@ class _TripHistoryPageState extends State<TripHistoryPage> {
                     .orderByChild('email')
                     .equalTo(SharedHelper.getstring(key: 'EMAIL')),
                 itemBuilder: (context, snapshot, animation, index) {
-                  return Padding(
-                    padding: EdgeInsets.all(8.h),
-                    child: Container(
-                      height: 40.h,
-                      width: double.infinity,
-                      decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(5.h),
-                          border: Border.all(color: AppColors.bottomColor)),
-                      child: Padding(
-                        padding: EdgeInsets.symmetric(horizontal: 10.w),
-                        child: Row(
-                          children: [
-                            InkWell(
-                                onTap: () {},
-                                child: Icon(
-                                  Icons.arrow_downward_sharp,
-                                  size: 18.h,
-                                )),
-                            5.widthBox,
-                            Text(
-                              snapshot.child('location').value.toString(),
-                              style: TextStyle(
-                                  fontSize: 14.sp,
-                                  fontWeight: FontWeight.w600,
-                                  color: Colors.black),
-                            ),
-                            5.widthBox,
-                            Text(
-                              DateTimeHelper.getDatetimeFormat(DateTime.parse(
-                                  snapshot
-                                      .child('date_time')
-                                      .value
-                                      .toString())),
-                              style: TextStyle(
-                                  fontSize: 14.sp,
-                                  fontWeight: FontWeight.w600,
-                                  color: Colors.grey[600]),
-                            ),
-                            const Spacer(),
-                            Text(
-                              '${snapshot.child('cost').value} EGY',
-                              style: TextStyle(
-                                  fontSize: 14.sp,
-                                  fontWeight: FontWeight.w600,
-                                  color: AppColors.bottomColor),
-                            )
-                          ],
-                        ),
-                      ),
-                    ),
-                  );
+                  return TripHistoryItem(snapshot: snapshot);
                 },
               ))
             ],
           )
         ],
       ),
+    );
+  }
+}
+
+// ignore: must_be_immutable
+class TripHistoryItem extends StatefulWidget {
+  final DataSnapshot snapshot;
+  bool isOpen = false;
+  TripHistoryItem({super.key, required this.snapshot});
+
+  @override
+  State<TripHistoryItem> createState() => _TripHistoryItemState();
+}
+
+class _TripHistoryItemState extends State<TripHistoryItem> {
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: EdgeInsets.all(8.h),
+      child: !widget.isOpen
+          ? Container(
+              height: 40.h,
+              width: double.infinity,
+              decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(5.h),
+                  border: Border.all(color: AppColors.bottomColor)),
+              child: Padding(
+                padding: EdgeInsets.symmetric(horizontal: 10.w),
+                child: Row(
+                  children: [
+                    InkWell(
+                        onTap: () {
+                              setState(() {
+                                widget.isOpen = !widget.isOpen;
+                              });
+                        },
+                        child: Icon(
+                          Icons.arrow_downward_sharp,
+                          size: 18.h,
+                        )),
+                    5.widthBox,
+                    Text(
+                      widget.snapshot.child('location').value.toString(),
+                      style: TextStyle(
+                          fontSize: 14.sp,
+                          fontWeight: FontWeight.w600,
+                          color: Colors.black),
+                    ),
+                    5.widthBox,
+                    Text(
+                      DateTimeHelper.getDatetimeFormat(DateTime.parse(
+                          widget.snapshot.child('date_time').value.toString())),
+                      style: TextStyle(
+                          fontSize: 14.sp,
+                          fontWeight: FontWeight.w600,
+                          color: Colors.grey[600]),
+                    ),
+                    const Spacer(),
+                    Text(
+                      '${widget.snapshot.child('cost').value} EGY',
+                      style: TextStyle(
+                          fontSize: 14.sp,
+                          fontWeight: FontWeight.w600,
+                          color: AppColors.bottomColor),
+                    )
+                  ],
+                ),
+              ),
+            )
+          : Container(
+              height: 140.h,
+              width: double.infinity,
+              decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(5.h),
+                  border: Border.all(color: AppColors.bottomColor)),
+              child: Column(
+                children: [
+                  Padding(
+                    padding:
+                        EdgeInsets.symmetric(horizontal: 10.w, vertical: 8.h),
+                    child: Row(
+                      children: [
+                        InkWell(
+                            onTap: () {
+                              setState(() {
+                                widget.isOpen = !widget.isOpen;
+                              });
+                            },
+                            child: Icon(
+                              Icons.arrow_upward_rounded,
+                              size: 20.h,
+                            )),
+                        Text(
+                          'Details',
+                          style: TextStyle(
+                              fontSize: 22.sp,
+                              fontWeight: FontWeight.bold,
+                              color: AppColors.bottomColor),
+                        )
+                      ],
+                    ),
+                  ),
+                  Padding(
+                    padding:
+                        EdgeInsets.symmetric(horizontal: 10.w, vertical: 1.h),
+                    child: Row(
+                      children: [
+                        Text(
+                          'Date:',
+                          style: TextStyle(
+                              fontSize: 15.sp,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.black),
+                        ),
+                        5.widthBox,
+                        Text(
+                          DateTimeHelper.getDatetimeFormat(DateTime.parse(
+                              widget.snapshot.child('date_time').value.toString())),
+                          style: TextStyle(
+                              fontSize: 15.sp,
+                              fontWeight: FontWeight.w600,
+                              color: Colors.grey[600]),
+                        ),
+                      ],
+                    ),
+                  ),
+                  Padding(
+                    padding:
+                        EdgeInsets.symmetric(horizontal: 10.w, vertical: 1.h),
+                    child: Row(
+                      children: [
+                        Text(
+                          'Time:',
+                          style: TextStyle(
+                              fontSize: 15.sp,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.black),
+                        ),
+                        5.widthBox,
+                        Text(
+                          DateTimeHelper.getHoursByAmBm(DateTime.parse(
+                              widget.snapshot.child('date_time').value.toString())),
+                          style: TextStyle(
+                              fontSize: 15.sp,
+                              fontWeight: FontWeight.w600,
+                              color: Colors.grey[600]),
+                        ),
+                      ],
+                    ),
+                  ),
+                  Padding(
+                    padding:
+                        EdgeInsets.symmetric(horizontal: 10.w, vertical: 1.h),
+                    child: Row(
+                      children: [
+                        Text(
+                          'Location:',
+                          style: TextStyle(
+                              fontSize: 15.sp,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.black),
+                        ),
+                        5.widthBox,
+                        Text(
+                          widget.snapshot.child('location').value.toString(),
+                          style: TextStyle(
+                              fontSize: 15.sp,
+                              fontWeight: FontWeight.w600,
+                              color: Colors.grey[600]),
+                        ),
+                      ],
+                    ),
+                  ),
+                  Padding(
+                    padding:
+                        EdgeInsets.symmetric(horizontal: 10.w, vertical: 1.h),
+                    child: Row(
+                      children: [
+                        Text(
+                          'Cost:',
+                          style: TextStyle(
+                              fontSize: 15.sp,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.black),
+                        ),
+                        5.widthBox,
+                        Text(
+                          widget.snapshot.child('cost').value.toString() +
+                              ' EGY',
+                          style: TextStyle(
+                              fontSize: 15.sp,
+                              fontWeight: FontWeight.w600,
+                              color: Colors.grey[600]),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
     );
   }
 }
